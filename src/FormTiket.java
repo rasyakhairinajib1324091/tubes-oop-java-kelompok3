@@ -1,3 +1,4 @@
+
 package tiketbioskop;
 
 import javax.swing.*;
@@ -26,7 +27,7 @@ public class FormTiket extends JFrame {
             new RegularTicket(), new VIPTicket()
     });
     JComboBox<String> cbPayment = new JComboBox<>(new String[]{
-            "Cash", "Debit"
+            "Cash", "Debit", "QRIS"
     });
 
     JLabel lblSeat = new JLabel("-");
@@ -47,11 +48,11 @@ public class FormTiket extends JFrame {
         setLayout(null);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        
+
         CustomPanel panel = new CustomPanel();
         setContentPane(panel);
         panel.setLayout(null);
-        
+
         panel.add(new JLabel("Movie Title")).setBounds(500, 30, 100, 25);
         cbTitle.setBounds(620, 30, 200, 25);
         panel.add(cbTitle);
@@ -92,19 +93,27 @@ public class FormTiket extends JFrame {
         panel.add(seatPanel);
 
         JButton btnCheckout = new JButton("CHECKOUT");
-        btnCheckout.setBounds(620, 390, 200, 26);
+        btnCheckout.setBounds(570, 395, 200, 28); 
         panel.add(btnCheckout);
 
+       //PANEL TABEL
+        JPanel tableBg = new JPanel(null);
+        tableBg.setBounds(20, 435, 1150, 245); 
+        tableBg.setBackground(new Color(176, 224, 230)); // biru muda
+        panel.add(tableBg);
+
         JScrollPane scroll = new JScrollPane(table);
-        scroll.setBounds(20, 420, 1150, 240);
+        scroll.setBounds(10, 10, 1130, 225);
+
+        table.setOpaque(true);
+        table.setBackground(Color.WHITE); 
         scroll.setOpaque(false);
         scroll.getViewport().setOpaque(false);
-        table.setOpaque(false);
-        table.setBackground(new Color(255, 255, 255, 77)); 
-        panel.add(scroll);
+
+        tableBg.add(scroll);
+        
 
         cbType.addActionListener(e -> updateTotal());
-
         seatPanel.setSeatChangeListener(this::updateTotal);
 
         btnCheckout.addActionListener(e -> {
@@ -146,6 +155,13 @@ public class FormTiket extends JFrame {
                         seats,
                         Integer.parseInt(lblTotal.getText())
                 ).setVisible(true);
+            } else if (paymentMethod.equals("QRIS")) {
+                ImageIcon qrisIcon = new ImageIcon(CustomPanel.class.getResource("qris.png"));
+                int result = JOptionPane.showConfirmDialog(this, "", "QRIS Payment", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, qrisIcon);
+                if (result == JOptionPane.OK_OPTION) {
+                    JOptionPane.showMessageDialog(this, "Pembayaran berhasil!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    finalizeOrder(seats, paymentMethod);
+                }
             } else {
                 finalizeOrder(seats, paymentMethod);
             }
@@ -178,7 +194,6 @@ public class FormTiket extends JFrame {
         seatPanel.selectedSeats.clear();
         lblSeat.setText("-");
         lblTotal.setText("0");
-
         seatPanel.updateSeatColors();
     }
 
